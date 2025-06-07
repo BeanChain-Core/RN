@@ -80,6 +80,15 @@ public class RewardDB {
         return (now - lastDrip) >= cooldownPeriod;  // returns true if enough time passed
     }
 
+    public static long getRemainingDripTime(String address) {
+        long lastDrip = getLastDrip(address);
+        long now = System.currentTimeMillis();
+        long cooldownPeriod = timeout * 60 * 60 * 1000; // timeout in hours → ms
+
+        long timeLeft = (lastDrip + cooldownPeriod) - now;
+        return Math.max(timeLeft, 0); // If cooldown passed, return 0
+    }
+
     // High-level helper for node trust score
     public static int getNodeScore(String address) {
         return getProfile(address).get("nodeScore").asInt(0);
