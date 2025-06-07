@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.beanchain</groupId>
-    <artifactId>RewardBeanNode</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>reward-node</artifactId>
+    <version>0.0.0</version>
 
     <dependencies>
         <dependency>
@@ -36,8 +36,8 @@
         </dependency>
         <dependency>
             <groupId>com.beanchain</groupId>
-            <artifactId>bean-core</artifactId>
-            <version>0.2.4</version>
+            <artifactId>bean-pack-java</artifactId>
+            <version>0.0.1</version>
         </dependency>
     </dependencies>
 
@@ -49,7 +49,7 @@
     <repositories>
          <repository>
             <id>github</id>
-            <url>https://maven.pkg.BeanChain-Core/BeanCore/BeanCore</url>
+            <url>https://maven.pkg.github.com/BeanChain-Core/BeanPack-java</url>
         </repository>
     </repositories>
 
@@ -67,7 +67,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>com.beanchainbeta.nodePortal.portal</mainClass>
+                    <mainClass>io.beanchain.nodePortal.portal</mainClass>
                 </configuration>
             </plugin>
         </plugins>

@@ -1,4 +1,4 @@
-package com.beanchainbeta.tools;
+package io.beanchain.tools;
 
 import java.util.Set;
 

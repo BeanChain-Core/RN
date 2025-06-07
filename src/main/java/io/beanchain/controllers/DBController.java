@@ -1,7 +1,8 @@
-package com.beanchainbeta.controllers;
+package io.beanchain.controllers;
 
 import org.springframework.web.bind.annotation.*;
-import com.beanchainbeta.services.RewardDB;
+
+import io.beanchain.services.RewardDB;
 
 
 

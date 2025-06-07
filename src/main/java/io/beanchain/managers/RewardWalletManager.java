@@ -1,7 +1,8 @@
-package com.beanchainbeta.managers;
+package io.beanchain.managers;
 
-import com.beanchainbeta.services.RewardDB;
 import java.util.Map;
+
+import io.beanchain.services.RewardDB;
 
 public class RewardWalletManager {
 

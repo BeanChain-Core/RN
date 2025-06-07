@@ -1,19 +1,20 @@
-package com.beanchainbeta.controllers;
+package io.beanchain.controllers;
 
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
-import com.bean_core.Block.Block;
-import com.bean_core.Block.BlockHeader;
-import com.bean_core.TXs.*;
-import com.bean_core.Utils.MetaHelper;
-import com.bean_core.crypto.WalletGenerator;
-import com.beanchainbeta.nodePortal.portal;
-import com.beanchainbeta.services.InternalTxFactory;
-import com.beanchainbeta.services.RewardDB;
-import com.beanchainbeta.tools.EarlyWalletRegistry;
+import com.beanpack.Block.Block;
+import com.beanpack.Block.BlockHeader;
+import com.beanpack.TXs.*;
+import com.beanpack.Utils.MetaHelper;
+import com.beanpack.crypto.WalletGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.beanchain.nodePortal.portal;
+import io.beanchain.services.InternalTxFactory;
+import io.beanchain.services.RewardDB;
+import io.beanchain.tools.EarlyWalletRegistry;
 
 public class MessageRouter {
 
