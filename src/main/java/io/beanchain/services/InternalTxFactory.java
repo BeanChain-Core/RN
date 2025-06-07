@@ -39,7 +39,7 @@ public class InternalTxFactory {
         return tx;     
     }
 
-    private static double calculateDrip() {
+    public static double calculateDrip() {
         long totalFaucetBalance = RewardWalletManager.getBalance(FAUCET_WALLET); // in beantoshi
 
         if (totalFaucetBalance <= 0) return 0;
