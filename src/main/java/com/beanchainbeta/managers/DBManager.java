@@ -1,4 +1,4 @@
-package com.beanchainbeta.controllers;
+package com.beanchainbeta.managers;
 
 import org.iq80.leveldb.DB;
 import org.iq80.leveldb.Options;
