@@ -5,7 +5,7 @@ import com.beanpack.beanify.Branding;
 import io.beanchain.config.ConfigLoader;
 import io.beanchain.managers.RewardWalletManager;
 import io.beanchain.tools.Node;
-import io.beanchain.tools.RNApplication;
+import io.beanchain.RNApplication;
 
 public class portal {
     public static volatile boolean isSyncing = true;
