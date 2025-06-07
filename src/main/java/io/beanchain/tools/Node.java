@@ -1,17 +1,17 @@
-package com.beanchainbeta.tools;
+package io.beanchain.tools;
 
 import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.util.concurrent.*;
 
-
-import com.bean_core.TXs.TX;
-import com.beanchainbeta.config.ConfigLoader;
-import com.beanchainbeta.controllers.MessageRouter;
-import com.beanchainbeta.controllers.PeerConnector;
+import com.beanpack.TXs.TX;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.node.*;
+
+import io.beanchain.config.ConfigLoader;
+import io.beanchain.controllers.MessageRouter;
+import io.beanchain.controllers.PeerConnector;
 
 public class Node {
     private final int port = ConfigLoader.networkPort; 
@@ -132,8 +132,8 @@ public class Node {
         }
     }
 
-    public void connectToGPN() {
-        String host = ConfigLoader.bootstrapIp;
+    public void connectToParentNode() {
+        String host = ConfigLoader.parentNodeIP;
         int port = 6442;
         try {
             Socket socket = new Socket(host, port);
