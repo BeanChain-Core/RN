@@ -1,4 +1,4 @@
-package com.beanchainbeta.controllers;
+package com.beanchainbeta.managers;
 
 import com.beanchainbeta.services.RewardDB;
 import java.util.Map;
@@ -23,7 +23,7 @@ public class RewardWalletManager {
                 RewardDB.markInitialized(wallet);
                 System.out.println("Initialized " + wallet + " to " + expectedBalance + " beantoshi");
             } else {
-                long current = RewardDB.getSystemBalance(wallet);
+                long current = getBalance(wallet);
                 System.out.println("🔁 " + wallet + " already initialized with " + current + " beantoshi");
             }
         }
