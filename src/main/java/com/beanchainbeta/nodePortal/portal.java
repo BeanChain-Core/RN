@@ -9,7 +9,7 @@ package com.beanchainbeta.nodePortal;
 
 import com.bean_core.beanify.Branding;
 import com.beanchainbeta.config.ConfigLoader;
-import com.beanchainbeta.controllers.RewardWalletManager;
+import com.beanchainbeta.managers.RewardWalletManager;
 import com.beanchainbeta.services.InternalTxFactory;
 import com.beanchainbeta.tools.Node;
 
