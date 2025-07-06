@@ -11,7 +11,7 @@ import io.beanchain.services.RewardDB;
 
 
 
-@CrossOrigin(origins = "*")
+
 @RestController
 @RequestMapping("/rn")
 public class ApiController {
