@@ -1,10 +1,12 @@
-package com.beanchainbeta.services;
+package io.beanchain.services;
 
 import org.iq80.leveldb.DB;
-import com.beanchainbeta.controllers.DBManager;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import io.beanchain.managers.DBManager;
 
 import java.nio.charset.StandardCharsets;
 
@@ -14,6 +16,7 @@ public class RewardDB {
     private static final ObjectMapper mapper = new ObjectMapper();
     private static final String INIT_KEY_PREFIX = "init-";
     private static final String NONCE_KEY = "RN-THIS";
+    private static final int timeout = 1; // adjust this for drip timeout in hours 
 
     // Fetch or create reward profile
     public static ObjectNode getProfile(String address) {
@@ -63,10 +66,27 @@ public class RewardDB {
         return getProfile(address).get("lastDrip").asLong(0);
     }
 
-    public static void updateLastDrip(String address, long timestamp) {
+    public static void updateLastDrip(String address) {
         ObjectNode profile = getProfile(address);
-        profile.put("lastDrip", timestamp);
+        profile.put("lastDrip", System.currentTimeMillis());
         saveProfile(address, profile);
+    }
+
+    public static boolean canDrip(String address) {
+        long lastDrip = getLastDrip(address);
+        long now = System.currentTimeMillis();
+        long cooldownPeriod = timeout * 60 * 60 * 1000; // timeout = number of hours (default set to 1)
+
+        return (now - lastDrip) >= cooldownPeriod;  // returns true if enough time passed
+    }
+
+    public static long getRemainingDripTime(String address) {
+        long lastDrip = getLastDrip(address);
+        long now = System.currentTimeMillis();
+        long cooldownPeriod = timeout * 60 * 60 * 1000; // timeout in hours → ms
+
+        long timeLeft = (lastDrip + cooldownPeriod) - now;
+        return Math.max(timeLeft, 0); // If cooldown passed, return 0
     }
 
     // High-level helper for node trust score

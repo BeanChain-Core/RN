@@ -1,14 +1,13 @@
-package com.beanchainbeta.services;
+package io.beanchain.services;
 
 import java.io.IOException;
 import java.security.PrivateKey;
 
-import com.bean_core.NodeConfig.ConfigLoader;
-import com.bean_core.TXs.*;
-import com.beanchainbeta.controllers.RewardWalletManager;
-import com.bean_core.Utils.*;
-import com.bean_core.Wizard.wizard;
-import com.bean_core.crypto.WalletGenerator;
+import com.beanpack.TXs.*;
+import com.beanpack.Utils.*;
+import com.beanpack.crypto.WalletGenerator;
+
+import io.beanchain.managers.RewardWalletManager;
 
 public class InternalTxFactory {
     
@@ -40,6 +39,36 @@ public class InternalTxFactory {
         return tx;     
     }
 
+    public static double calculateDrip() {
+        long totalFaucetBalance = RewardWalletManager.getBalance(FAUCET_WALLET); // in beantoshi
+
+        if (totalFaucetBalance <= 0) return 0;
+
+        double initialRatio = 100.0 / 5_000_000; // First drip was 100 out of 5mil
+        long nextDripToshi = Math.round(totalFaucetBalance * initialRatio);
+        double nextDrip = beantoshinomics.toBean(nextDripToshi);
+
+        if (nextDrip < 1) return 1;
+        return nextDrip; // convert back to whole BEAN
+    }
+
+    public static AirdropTX createFaucetDripTx(String toAddress) throws IOException, Exception {
+        String RNWallet = rewardAddress;
+        double dripThis = calculateDrip();
+        long beantoshi = beantoshinomics.toBeantoshi(dripThis);
+
+        if (!RewardWalletManager.hasEnough(FAUCET_WALLET, beantoshi)) {
+            System.err.println("Not enough balance in FAUCET_WALLET to reward " + toAddress);
+            return null;
+        }
+
+        int nonce = RewardDB.incrementSystemNonce();
+        AirdropTX tx = new AirdropTX(RNWallet, toAddress, dripThis, nonce, FAUCET_WALLET, 0);
+        tx.sign(getKey());
+        RewardWalletManager.deduct(FAUCET_WALLET, beantoshi);
+        return tx;     
+    }
+
     public static AirdropTX createValidatorGasRewardTx(String validatorAddress, long gasReward) throws IOException, Exception {
         String RNWallet = rewardAddress;
         long beantoshi = gasReward;
@@ -64,6 +93,5 @@ public class InternalTxFactory {
         PrivateKey key = fullNodePrivateKey;
         return key;
     }
-
-    
+  
 }

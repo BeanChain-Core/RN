@@ -1,6 +1,6 @@
-package com.beanchainbeta.controllers;
+package io.beanchain.controllers;
 
-import com.bean_core.TXs.*;
+import com.beanpack.TXs.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 

@@ -1,19 +1,17 @@
-package com.beanchainbeta.controllers;
+package io.beanchain.controllers;
 
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
-
-import com.bean_core.Block.Block;
-import com.bean_core.Block.BlockHeader;
-import com.bean_core.TXs.*;
-import com.bean_core.Utils.MetaHelper;
-import com.bean_core.crypto.WalletGenerator;
-import com.beanchainbeta.nodePortal.portal;
-import com.beanchainbeta.services.InternalTxFactory;
-import com.beanchainbeta.services.RewardDB;
-import com.beanchainbeta.tools.EarlyWalletRegistry;
+import com.beanpack.Block.Block;
+import com.beanpack.Block.BlockHeader;
+import com.beanpack.TXs.*;
+import com.beanpack.crypto.WalletGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.beanchain.services.InternalTxFactory;
+import io.beanchain.services.RewardDB;
+import io.beanchain.services.TrustDB;
+import io.beanchain.tools.EarlyWalletRegistry;
 
 public class MessageRouter {
 
@@ -96,7 +94,7 @@ public class MessageRouter {
         TX tx = mapper.treeToValue(msg.get("payload"), TX.class);
         String toAddress = tx.getTo();
 
-        if (toAddress == null || !toAddress.startsWith("BEANX:0x")) {
+        if (toAddress == null || !toAddress.startsWith("BEANX:0x") || toAddress.startsWith("BBEANX:0x")) {
             System.out.println("Ignored non-user TX: " + tx.getTxHash());
             return;
         }
@@ -144,6 +142,9 @@ private void handleIncomingBlock(JsonNode msg) {
             System.out.println("No validator reward for block (gas fee = 0).");
             return;
         }
+        
+        TrustDB trusty = new TrustDB();
+        trusty.updateBlock(header.getHeight());
 
         AirdropTX validatorReward = InternalTxFactory.createValidatorGasRewardTx(validatorAdress, gasFeeReward);
         PeerConnector.sendTxToGPN(validatorReward);
