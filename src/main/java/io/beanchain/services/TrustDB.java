@@ -21,7 +21,7 @@ public class TrustDB {
     private static final double MIN_TRUST = 0.5;
 
     public TrustDB() {
-        this.db = DBManager.getDB("./data/trustDB");
+        this.db = DBManager.getDB("trustDB");
     }
 
     public void saveTrustEntry(TrustEntry entry) throws IOException {

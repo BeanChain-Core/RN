@@ -6,12 +6,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Random;
 
 public class PeerConnector {
 
     private static Socket gpnSocket;
     private static PrintWriter out;
     private static final ObjectMapper mapper = new ObjectMapper();
+    private static int currentPing = 0;
 
     // Call this once after GPN socket is established
     public static void init(Socket gpn) {
@@ -51,6 +53,28 @@ public class PeerConnector {
         }
     }
 
+    public static void startPingGossipToGPN() {
+        if (out == null) {
+            System.err.println("GPN socket not initialized. Cannot send Ping Gossip.");
+            return;
+        }
+
+        try {
+            currentPing = PingUtils.generateRandomPingNumber();
+            ObjectNode wrapper = mapper.createObjectNode();
+            wrapper.put("type", "ping");
+            wrapper.put("payload", String.valueOf(currentPing)); // FIXED
+
+            String message = mapper.writeValueAsString(wrapper);
+            out.println(message);
+
+            System.out.println("[BeanLog] [PING] gossip sent: " + currentPing);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public static boolean isConnected() {
         return gpnSocket != null && gpnSocket.isConnected() && !gpnSocket.isClosed();
     }
@@ -62,6 +86,14 @@ public class PeerConnector {
             System.err.println("Error closing GPN socket:");
             e.printStackTrace();
         }
+    }
+}
+
+class PingUtils {
+    private static final Random random = new Random();
+
+    public static int generateRandomPingNumber() {
+        return 10000000 + random.nextInt(90000000);
     }
 }
 

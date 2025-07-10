@@ -4,14 +4,19 @@ import java.net.Socket;
 import com.beanpack.Block.Block;
 import com.beanpack.Block.BlockHeader;
 import com.beanpack.TXs.*;
+import com.beanpack.Utils.hex;
+import com.beanpack.crypto.TransactionVerifier;
 import com.beanpack.crypto.WalletGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.beanchain.services.InternalTxFactory;
+import io.beanchain.services.PongDBService;
 import io.beanchain.services.RewardDB;
 import io.beanchain.services.TrustDB;
 import io.beanchain.tools.EarlyWalletRegistry;
+import io.beanchain.tools.Hasher;
+import io.beanchain.tools.Node;
 
 public class MessageRouter {
 
@@ -35,8 +40,56 @@ public class MessageRouter {
             case "block":
                 handleIncomingBlock(message);
                 break;
+            case "pong":
+                handlePong(message, peer.getInetAddress().getHostAddress());
+                break;
             default:
-                System.out.println("Unknown message type: " + type);
+                System.out.println("[UNKNOWN]: " + type);
+        }
+    }
+
+    public static void handlePong(JsonNode message, String sourceIp) {
+        try {
+            JsonNode payload = message.get("payload");
+            if (payload == null) {
+                System.err.println("[Pong] Missing payload.");
+                return;
+            }
+
+            String pingNumber = payload.get("pingNumber").asText();
+            String publicKeyHex = payload.get("publicKey").asText();
+            String receivedHash = payload.get("hash").asText();
+            String signature = payload.get("signature").asText();
+
+            // Step 1: Reconstruct hash from pingNumber + publicKey
+            String rawData = pingNumber + publicKeyHex;
+            String computedHash = Hasher.generateHash(rawData); 
+
+            if (!computedHash.equals(receivedHash)) {
+                System.err.println("[Pong] Hash mismatch. Possible tampering.");
+                return;
+            }
+
+            // Step 2: Verify signature against the hash
+            boolean isValid = TransactionVerifier.verifySHA256Transaction(publicKeyHex, hex.hexToBytes(computedHash), signature); // assumes hex input
+            if (!isValid) {
+                System.err.println("[Pong] Invalid signature.");
+                return;
+            }
+
+            // Step 3: Derive wallet address from public key
+            String address = WalletGenerator.generateAddress(publicKeyHex);
+
+            TX tx = InternalTxFactory.createNodeRewardTx(address);
+            PeerConnector.sendTxToGPN(tx);
+
+            // Step 4: Record to pongDB
+            PongDBService.recordPongResponse(pingNumber, address, sourceIp);
+            System.out.println("[Pong] ✅ Verified and recorded pong for: " + address);
+
+        } catch (Exception e) {
+            System.err.println("[Pong] Error handling pong: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -138,13 +191,18 @@ private void handleIncomingBlock(JsonNode msg) {
         String validatorAdress = WalletGenerator.generateAddress(validatorKey);
         long gasFeeReward = (long) header.getGasFeeReward();
 
+        int height = header.getHeight();
+                if(height % 10 == 0){
+                    PeerConnector.startPingGossipToGPN();
+                }
+                
         if (gasFeeReward <= 0) {
             System.out.println("No validator reward for block (gas fee = 0).");
             return;
         }
         
         TrustDB trusty = new TrustDB();
-        trusty.updateBlock(header.getHeight());
+        trusty.updateBlock(height);
 
         AirdropTX validatorReward = InternalTxFactory.createValidatorGasRewardTx(validatorAdress, gasFeeReward);
         PeerConnector.sendTxToGPN(validatorReward);

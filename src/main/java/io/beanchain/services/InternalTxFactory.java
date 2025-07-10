@@ -8,12 +8,14 @@ import com.beanpack.Utils.*;
 import com.beanpack.crypto.WalletGenerator;
 
 import io.beanchain.managers.RewardWalletManager;
+import io.beanchain.tools.NodeRewardPolicy;
 
 public class InternalTxFactory {
     
     private static final String EARLY_WALLET = "BEANX:0xEARLYWALLET";
     private static final String GAS_WALLET = "BEANX:0xGASPOOL";
     private static final String FAUCET_WALLET = "BEANX:0xFAUCETWALLET";
+    private static final String NODE_REWARD = "BEANX:0xNODEREWARD";
     
     private static String rewardPrivateKeyHex;
     private static PrivateKey fullNodePrivateKey;
@@ -22,6 +24,24 @@ public class InternalTxFactory {
     
     
 
+    public static AirdropTX createNodeRewardTx(String toAddress) throws IOException, Exception {
+        String RNWallet = rewardAddress;
+        TrustDB trustDB = new TrustDB();
+        long height = trustDB.getCurrentBlockHeight();
+        double amount = NodeRewardPolicy.getNodeReward(height);
+        long beantoshi = beantoshinomics.toBeantoshi(amount);
+
+        if (!RewardWalletManager.hasEnough(NODE_REWARD, beantoshi)) {
+            System.err.println("Not enough balance in NODEREWARD to reward " + toAddress);
+            return null;
+        }
+
+        int nonce = RewardDB.incrementSystemNonce();
+        AirdropTX tx = new AirdropTX(RNWallet, toAddress, amount, nonce, NODE_REWARD, 0);
+        tx.sign(getKey());
+        RewardWalletManager.deduct(NODE_REWARD, beantoshi);
+        return tx;     
+    }
 
     public static AirdropTX createEarlyRewardTx(String toAddress) throws IOException, Exception {
         String RNWallet = rewardAddress;
@@ -44,7 +64,7 @@ public class InternalTxFactory {
 
         if (totalFaucetBalance <= 0) return 0;
 
-        double initialRatio = 100.0 / 5_000_000; // First drip was 100 out of 5mil
+        double initialRatio = 100.0 / 10_000_000; // First drip was 100 out of 10mil
         long nextDripToshi = Math.round(totalFaucetBalance * initialRatio);
         double nextDrip = beantoshinomics.toBean(nextDripToshi);
 
