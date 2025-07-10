@@ -159,6 +159,8 @@ public class Node {
             msg.put("syncMode", "TX_ONLY");
             msg.put("isValidator", false);
             msg.put("isPublicNode", false);
+            msg.put("nodeType", "RN");
+            //msg.put("version", "sprout");
     
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
             out.println(mapper.writeValueAsString(msg));
