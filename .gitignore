@@ -23,4 +23,8 @@ Thumbs.db
 .idea/
 
 # Local config files (do NOT commit private keys!)
-/config.docs/*
+*config.docs/
+
+#team dev 
+makefile
+RNPK/
