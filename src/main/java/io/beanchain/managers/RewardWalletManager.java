@@ -7,9 +7,10 @@ import io.beanchain.services.RewardDB;
 public class RewardWalletManager {
 
     private static final Map<String, Long> GENESIS_BALANCES = Map.of(
-        "BEANX:0xEARLYWALLET", 5_000_000_000_000L,   // 5,000,000 BEAN
-        "BEANX:0xFAUCETWALLET", 5_000_000_000_000L,  // 5,000,000 BEAN
-        "BEANX:0xNODEREWARD", 30_000_000_000_000L    // 30,000,000 BEAN
+        "BEANX:0xEARLYWALLET", 10_000_000_000_000L,   // 10,000,000 BEAN
+        "BEANX:0xFAUCETWALLET", 10_000_000_000_000L,  // 10,000,000 BEAN
+        "BEANX:0xNODEREWARD", 40_000_000_000_000L,    // 40,000,000 BEAN
+        "BEANX:0xSTAKEREWARD", 14_000_000_000_000L    // 14,000,000 BEAN
     );
 
     public static void initializeBalances() {
